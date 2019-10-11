@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static laba2.TextSeparator.removeExcessTokensInASentence;
 
@@ -32,24 +33,22 @@ public class OutputService {
             posOfPalFirstLetterEnter.add(matcher.start());
         }
 
-        List<Integer> posOfPalEnter = new ArrayList<>();
-        for (int position : posOfPalFirstLetterEnter) {
-            String str = removeExcessTokensInASentence(sentenceWithPalInLowCase.substring(position));
-            if (str.contains(palString))
-                posOfPalEnter.add(position);
-        }
+        List<Integer> posOfPalEnter = posOfPalFirstLetterEnter.stream()
+                        .filter(position -> removeExcessTokensInASentence(sentenceWithPalInLowCase.substring(position))
+                        .contains(palString))
+                        .collect(Collectors.toList());
 
         int size = posOfPalEnter.size();
         int indexOfEntry = posOfPalFirstLetterEnter.get(size - 1);
-        String resultString = "";
-        List<Integer> newList = new ArrayList<>(posOfPalFirstLetterEnter.subList(posOfPalFirstLetterEnter.indexOf(indexOfEntry), posOfPalFirstLetterEnter.size()));
-        for (int i : newList) {
-            String str = removeExcessTokensInASentence(sentenceWithPalInLowCase.substring(indexOfEntry, i + 1));
-            if (str.contains(palString)) {
-                resultString = sentenceWithPal.substring(indexOfEntry, i + 1);
-                break;
-            }
-        }
-        return resultString;
+
+        List<Integer> newList = new ArrayList<>(posOfPalFirstLetterEnter.subList(posOfPalFirstLetterEnter.indexOf(indexOfEntry),
+                posOfPalFirstLetterEnter.size()));
+        int index_pal = newList.stream()
+                        .filter(i -> removeExcessTokensInASentence(sentenceWithPalInLowCase.substring(indexOfEntry, i+1))
+                        .contains(palString))
+                        .findFirst()
+                        .get();
+
+        return sentenceWithPal.substring(indexOfEntry, index_pal + 1);
     }
 }
